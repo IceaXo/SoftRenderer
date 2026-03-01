@@ -1,0 +1,18 @@
+# 编译生成的垃圾场，严禁上传！
+build/
+bin/
+*.o
+*.obj
+*.exe
+*.out
+
+# 我们自己生成的图片文件，不需要追踪
+*.ppm
+*.png
+*.jpg
+
+# 各大 IDE 的私有缓存，别拿去恶心同事
+.vscode/
+.vs/
+*.sln
+*.vcxproj
