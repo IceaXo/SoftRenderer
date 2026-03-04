@@ -1,0 +1,15 @@
+# 重新画图纸（这次它只会找到微软的正统 math.h）
+cmake -S . -B build
+
+# 点火！
+cmake --build build
+
+# 运行法相！
+.\SoftRenderer.exe
+
+
+git add .
+
+git commit -m ""
+
+git push

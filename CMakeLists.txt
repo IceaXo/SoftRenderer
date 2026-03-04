@@ -1,20 +1,23 @@
-# 声明要求的最低 CMake 版本
 cmake_minimum_required(VERSION 3.10)
 
-# 宗门项目名称与使用的语言标准 (C++17 是目前大厂最稳的基石)
+# 定义项目名称和使用的语言 (CXX 代表 C++)
 project(SoftRenderer CXX)
+
+# 强制使用 C++17 标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# 告诉编译器，去 include 文件夹里找头文件
+add_compile_options(/utf-8)
+
+# 告诉包工头，头文件(菜单)都在 include 文件夹里
 include_directories(include)
 
-# 收集所有干活的源文件
+# 收集你当前所有的源文件(后厨)
 set(SOURCES
     src/main.cpp
     src/framebuffer.cpp
     src/rasterizer.cpp
 )
 
-# 终极法术：把上面这些文件，熔炼成一个叫 SoftRenderer 的可执行程序！
+# 凝结法相：将所有源码打包成 SoftRenderer.exe
 add_executable(SoftRenderer ${SOURCES})
