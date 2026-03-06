@@ -21,4 +21,6 @@ public:
     void Clear(Color c);
     void SetPixel(int x,int y,Color c);
     void SaveToPPM(const std::string& filename);
+    int GetWidth();
+    int GetHeight();
 };

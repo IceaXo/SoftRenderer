@@ -1,5 +1,8 @@
 #include <iostream>
 #include "framebuffer.h" // 必须包含画布菜单！
+#include "rasterizer.h"
+#include "geometry.h"
+
 
 int main(){
     std::cout << "[系统提示] 师弟，软光栅护宗大阵已启动！" << std::endl;
@@ -16,6 +19,12 @@ int main(){
             fb.SetPixel(400+i, 300+j, 0x0000FF00); 
         }
     }
+    Rasterizer::DrawLine(fb,0,0,800,600,0x000000FF);
+
+    Vec2i a(200,200);
+    Vec2i b(400,200);
+    Vec2i c(300,400);
+    Rasterizer::DrawTriangle(a,b,c,0x00FFFFFF,fb);
     fb.SaveToPPM("test.ppm");
     
     return 0;

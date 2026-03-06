@@ -5,7 +5,7 @@ cmake -S . -B build
 cmake --build build
 
 # 运行法相！
-.\SoftRenderer.exe
+.\build\Debug\SoftRenderer.exe
 
 
 git add .

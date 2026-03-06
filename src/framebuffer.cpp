@@ -68,3 +68,11 @@ void FrameBuffer::SaveToPPM(const std::string& filename){
     file.close();
     std::cout<<"[FrameBuffer]已生成"<<filename<<std::endl;
 }
+
+int FrameBuffer::GetWidth(){
+    return width;
+}
+
+int FrameBuffer::GetHeight(){
+    return height;
+}
