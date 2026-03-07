@@ -24,7 +24,12 @@ int main(){
     Vec2i a(200,200);
     Vec2i b(400,200);
     Vec2i c(300,400);
-    Rasterizer::DrawTriangle(a,b,c,0x00FFFFFF,fb);
+    
+    Color colorA = 0x00FF0000;
+    Color colorB = 0x0000FF00;
+    Color colorC = 0x000000FF;
+
+    Rasterizer::DrawTriangle(a,b,c,colorA, colorB, colorC,fb);
     fb.SaveToPPM("test.ppm");
     
     return 0;
