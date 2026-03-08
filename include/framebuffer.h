@@ -14,13 +14,19 @@ private:
 
     std::vector<Color> color_buffer;
 
+    std::vector<float> depth_buffer;
+
 public:
     FrameBuffer(int w,int h);
     ~FrameBuffer() = default;
     
     void Clear(Color c);
+    void SetPixel(int index,Color c);
     void SetPixel(int x,int y,Color c);
     void SaveToPPM(const std::string& filename);
     int GetWidth();
     int GetHeight();
+
+    void SetDepth(int index, float z);
+    float GetDepth(int index);
 };

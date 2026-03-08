@@ -2,20 +2,25 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>  // 引入文件流法术，用于读写硬盘
+#include <limits>
 
 FrameBuffer::FrameBuffer(int w,int h):width(w),height(h){
     color_buffer.resize(width*height,0x00000000);
+    depth_buffer.resize(width*height,std::numeric_limits<float>::max());
 }
 
 void FrameBuffer::Clear(Color c){
     std::fill(color_buffer.begin(),color_buffer.end(),c);
+    std::fill(depth_buffer.begin(),depth_buffer.end(),std::numeric_limits<float>::max());
 }
 
-void FrameBuffer::SetPixel(int x, int y, Color c){
-    if (x<0||x>=width||y<0||y>=height) return;
-
-    int index = y*width+x;
+void FrameBuffer::SetPixel(int index, Color c){
+    if (index<0||index>=width*height) return;
     color_buffer[index] = c;
+}
+void FrameBuffer::SetPixel(int x,int y,Color c){
+    if (x<0||x>=width||y<0||y>=height) return;
+    color_buffer[y*width+x] = c;
 }
 
 void FrameBuffer::SaveToPPM(const std::string& filename){
@@ -75,4 +80,14 @@ int FrameBuffer::GetWidth(){
 
 int FrameBuffer::GetHeight(){
     return height;
+}
+
+void FrameBuffer::SetDepth(int index, float depth){
+    if (index<0||index >= width*height) return;
+    depth_buffer[index] = depth;
+}
+
+float FrameBuffer::GetDepth(int index){
+    if (index<0||index >= width*height) std::numeric_limits<float>::max();
+    return depth_buffer[index];
 }
