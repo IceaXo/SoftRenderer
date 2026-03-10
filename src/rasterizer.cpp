@@ -39,15 +39,19 @@ void Rasterizer::DrawLine(FrameBuffer& fb,int x0,int y0,int x1,int y1,Color c){
     }
 }
 
-void Rasterizer::DrawTriangle(const Vec3f& a,const Vec3f& b,const Vec3f& c,
+void Rasterizer::DrawTriangle(const Vec4f& a,const Vec4f& b,const Vec4f& c,
     Color colorA,Color colorB, Color colorC,FrameBuffer& fb){
-    
+    Vec3f a_3d(a.x,a.y,a.z);
+    Vec3f b_3d(b.x,b.y,b.z);
+    Vec3f c_3d(c.x,c.y,c.z);
+
     //总面积
-    Vec3f ab = b-a;
-    Vec3f ac = c-a;
-    Vec3f bc = c-b;
-    Vec3f ca = a-c;
-    float total_area = static_cast<float>(std::abs(CrossProduct2D(ab,ac)));
+    Vec3f ab = b_3d-a_3d;
+    Vec3f ac = c_3d-a_3d;
+    Vec3f bc = c_3d-b_3d;
+    Vec3f ca = a_3d-c_3d;
+
+    float total_area = std::abs(CrossProduct2D(ab,ac));
     float inv_area = 1.0f / total_area; //循环内做浮点数乘法
 
     if(total_area == 0.0f) return; //三点一线
@@ -70,13 +74,31 @@ void Rasterizer::DrawTriangle(const Vec3f& a,const Vec3f& b,const Vec3f& c,
     int max_x = std::min(fb.GetWidth()-1,static_cast<int>(std::max({a.x,b.x,c.x})));
     int min_y = std::max(0,static_cast<int>(std::min({a.y,b.y,c.y})));
     int max_y = std::min(fb.GetHeight()-1,static_cast<int>(std::max({a.y,b.y,c.y})));
+
+    //用w算出真实深度
+    float inv_w_a = 1.0f / a.w;
+    float inv_w_b = 1.0f / b.w;
+    float inv_w_c = 1.0f / c.w;
+
+    // 红色通道马甲
+    float rA_w = rA * inv_w_a;
+    float rB_w = rB * inv_w_b;
+    float rC_w = rC * inv_w_c;
+    // 绿色通道马甲
+    float gA_w = gA * inv_w_a;
+    float gB_w = gB * inv_w_b;
+    float gC_w = gC * inv_w_c;
+    // 蓝色通道马甲
+    float bA_w = bA * inv_w_a;
+    float bB_w = bB * inv_w_b;
+    float bC_w = bC * inv_w_c;
     
     for (int y=min_y;y<=max_y;++y){
         for (int x=min_x;x<=max_x;++x){
             Vec3f p(static_cast<float>(x),static_cast<float>(y),0.0f);
-            Vec3f ap = p-a;
-            Vec3f bp = p-b;
-            Vec3f cp = p-c;
+            Vec3f ap = p-a_3d;
+            Vec3f bp = p-b_3d;
+            Vec3f cp = p-c_3d;
 
             float z1 = CrossProduct2D(ab,ap);
             float z2 = CrossProduct2D(bc,bp);
@@ -88,22 +110,32 @@ void Rasterizer::DrawTriangle(const Vec3f& a,const Vec3f& b,const Vec3f& c,
                 float beta = std::abs(z3)*inv_area;
                 float gamma = std::abs(z1)*inv_area;
 
-                //新功能 1：通过三个顶点的 Z，插值算出当前像素点真实的物理深度
-                float current_z = a.z*alpha+b.z*beta+c.z*gamma;
+                //通过三个顶点的 Z，插值算出当前像素点真实的物理深度
+                float current_inv_w = inv_w_a*alpha+inv_w_b*beta+inv_w_c*gamma;
+                float current_real_w = 1.0f/current_inv_w;
+
                 int index = y*fb.GetWidth()+x;
 
-                if (current_z < fb.GetDepth(index)){
+                if (current_real_w < fb.GetDepth(index)){
                     //2.按权重混合
-                    int r_new = static_cast<int>(rA*alpha+rB*beta+rC*gamma);
-                    int g_new = static_cast<int>(gA*alpha+gB*beta+gC*gamma);
-                    int b_new = static_cast<int>(bA*alpha+bB*beta+bC*gamma);
+                    float current_r_w = rA_w*alpha+rB_w*beta+rC_w*gamma;
+                    float current_g_w = gA_w*alpha+gB_w*beta+gC_w*gamma;
+                    float current_b_w = bA_w*alpha+bB_w*beta+bC_w*gamma;
+
+                    int r_new = static_cast<int>(current_r_w * current_real_w);
+                    int g_new = static_cast<int>(current_g_w * current_real_w);
+                    int b_new = static_cast<int>(current_b_w * current_real_w);
+
+                    r_new = std::min(255, std::max(0, r_new));
+                    g_new = std::min(255, std::max(0, g_new));
+                    b_new = std::min(255, std::max(0, b_new));
 
                     //4.打包为Color
                     Color final_color = (r_new<<16)|(g_new<<8)|b_new;
                     
                     //画像素
                     fb.SetPixel(index,final_color);
-                    fb.SetDepth(index,current_z);
+                    fb.SetDepth(index,current_real_w);
                 }
             }
         }
