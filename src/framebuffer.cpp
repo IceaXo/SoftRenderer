@@ -88,6 +88,6 @@ void FrameBuffer::SetDepth(int index, float depth){
 }
 
 float FrameBuffer::GetDepth(int index){
-    if (index<0||index >= width*height) std::numeric_limits<float>::max();
+    if (index<0||index >= width*height) return std::numeric_limits<float>::max();
     return depth_buffer[index];
 }

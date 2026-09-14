@@ -7,7 +7,9 @@ project(SoftRenderer CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_compile_options(/utf-8)
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
 
 # 告诉包工头，头文件(菜单)都在 include 文件夹里
 include_directories(include)
@@ -21,3 +23,9 @@ set(SOURCES
 
 # 凝结法相：将所有源码打包成 SoftRenderer.exe
 add_executable(SoftRenderer ${SOURCES})
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(framebuffer_tests tests/framebuffer_tests.cpp src/framebuffer.cpp)
+    add_test(NAME framebuffer_bounds COMMAND framebuffer_tests)
+endif()

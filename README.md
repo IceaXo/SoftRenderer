@@ -1,5 +1,7 @@
 # SoftRenderer · C++ CPU 软件光栅器
 
+[完整项目导读：流程、设计取舍与验证](docs/PROJECT_GUIDE.md)
+
 用 C++17 在 CPU 上将三维顶点转换为二维像素，并输出 PPM 图像。当前程序绘制棋盘地面、墙面和彩色三角形，用于观察透视、颜色插值和遮挡关系。
 
 这是个人图形学实践，工作内容覆盖向量/矩阵、MVP 变换、三角形光栅化、颜色与深度缓冲，以及文件输出。当前没有交互编辑器或完整游戏引擎。
@@ -26,7 +28,7 @@ flowchart LR
 
 ## 构建与结果
 
-当前 CMake 使用 MSVC 的 `/utf-8` 选项，以下按 Windows + Visual Studio 2022、CMake 3.10+ 准备。在仓库根目录执行：
+支持 C++17 工具链与 CMake 3.10+，UTF-8 选项仅对 MSVC 生效。以下为 Windows / Visual Studio 示例，在仓库根目录执行：
 
 ```powershell
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64
@@ -38,7 +40,11 @@ cmake --build build --config Release
 
 ## 当前状态
 
-2026-09-14 完成展示说明与关键代码静态核对，未重新构建或运行。已知 `GetDepth` 越界分支缺少 `return`，需要修复后再完成边界验证；本轮文档更新没有修改源代码。跨编译器选项和渲染边界也待进一步整理。
+2026-09-14 使用 Windows / GCC 15.2 完成 Release 构建、深度缓冲边界测试与实际渲染。GetDepth 越界读取已修复，检查覆盖负下标、上边界、正常读写、清屏和零尺寸缓冲。
+
+![实际渲染结果](docs/render.png)
+
+图为本次实际输出的 PPM 转换为 PNG，未修改场景。可用 ctest --test-dir build -C Release --output-on-failure 运行回归。MinGW 工具链在本机对中文构建路径支持不稳定，验证使用了 ASCII 路径。
 
 [历史开发记录](https://github.com/IceaXo/SoftRenderer/blob/c3cdf316d241dc069bbb4db2aa21b528948d4906/README.md) 保留当时表述，当前范围以本页为准。
 
